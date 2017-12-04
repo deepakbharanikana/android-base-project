@@ -3,6 +3,7 @@ package co.lateralview.myapp.domain.repository.implementation;
 import co.lateralview.myapp.domain.model.User;
 import co.lateralview.myapp.domain.repository.interfaces.SessionRepository;
 import co.lateralview.myapp.infraestructure.manager.interfaces.SharedPreferencesManager;
+import io.reactivex.disposables.CompositeDisposable;
 
 
 public class SessionRepositoryImpl implements SessionRepository
@@ -12,6 +13,7 @@ public class SessionRepositoryImpl implements SessionRepository
     private SharedPreferencesManager mSharedPreferencesManager;
     private User mCurrentUser;
     private String mAccessToken;
+    private CompositeDisposable mDisposable = new CompositeDisposable();
 
     public SessionRepositoryImpl(SharedPreferencesManager sharedPreferencesManager)
     {

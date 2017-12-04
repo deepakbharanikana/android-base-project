@@ -7,6 +7,9 @@ import java.lang.reflect.Type;
 
 import co.lateralview.myapp.infraestructure.manager.interfaces.ParserManager;
 import co.lateralview.myapp.infraestructure.manager.interfaces.SharedPreferencesManager;
+import co.lateralview.myapp.infraestructure.util.Optional;
+import io.reactivex.Completable;
+import io.reactivex.Single;
 
 public class SharedPreferencesManagerImpl implements SharedPreferencesManager
 {
@@ -26,76 +29,90 @@ public class SharedPreferencesManagerImpl implements SharedPreferencesManager
         this(context, parserManager, DEFAULT_FILE_NAME);
     }
 
-    public void save(String key, boolean value)
+    @Override
+    public Completable save(String key, boolean value)
     {
-        mSharedPreferences.edit().putBoolean(key, value).apply();
+        return Completable.create(e -> mSharedPreferences.edit().putBoolean(key, value).apply());
     }
 
-    public void save(String key, String value)
+    @Override
+    public Completable save(String key, String value)
     {
-        mSharedPreferences.edit().putString(key, value).apply();
+        return Completable.create(e -> mSharedPreferences.edit().putString(key, value).apply());
     }
 
-    public void save(String key, int value)
+    @Override
+    public Completable save(String key, int value)
     {
-        mSharedPreferences.edit().putInt(key, value).apply();
+        return Completable.create(e -> mSharedPreferences.edit().putInt(key, value).apply());
     }
 
-    public boolean getBoolean(String key)
+    @Override
+    public Single<Boolean> getBoolean(String key)
     {
-        return mSharedPreferences.getBoolean(key, false);
+        return getBoolean(key, false);
     }
 
-    public boolean getBoolean(String key, boolean defaultValue)
+    @Override
+    public Single<Boolean> getBoolean(String key, boolean defaultValue)
     {
-        return mSharedPreferences.getBoolean(key, defaultValue);
+        return Single.just(mSharedPreferences.getBoolean(key, defaultValue));
     }
 
-    public String getString(String key)
+    @Override
+    public Single<String> getString(String key)
     {
         return getString(key, "");
     }
 
-    public String getString(String key, String defaultValue)
+    @Override
+    public Single<String> getString(String key, String defaultValue)
     {
-        return mSharedPreferences.getString(key, defaultValue);
+        return Single.just(mSharedPreferences.getString(key, defaultValue));
     }
 
-    public int getInt(String key)
+    @Override
+    public Single<Integer> getInt(String key)
     {
         return getInt(key, -1);
     }
 
-    public int getInt(String key, int defaultValue)
+    @Override
+    public Single<Integer> getInt(String key, int defaultValue)
     {
-        return mSharedPreferences.getInt(key, defaultValue);
-    }
-
-    public <T> void save(String key, T model)
-    {
-        mSharedPreferences.edit().putString(key, mParserManager.toJson(model)).apply();
-    }
-
-    public <T> T get(String key, Class<T> type)
-    {
-        String json = getString(key);
-        return json != "" ? mParserManager.fromJson(json, type) : null;
+        return Single.just(mSharedPreferences.getInt(key, defaultValue));
     }
 
     @Override
-    public <T> T get(String key, Type type)
+    public <T> Completable save(String key, T model)
     {
-        String json = getString(key);
-        return json != "" ? (T) mParserManager.fromJson(json, type) : null;
+        return Completable.create(e ->
+                mSharedPreferences.edit().putString(key, mParserManager.toJson(model)).apply());
     }
 
-    public void clear()
+    @Override
+    public <T> Single get(String key, Class<T> type)
     {
-        mSharedPreferences.edit().clear().apply();
+        return getString(key).map(json -> !json.equals("") ?
+                mParserManager.fromJson(json, type) : new Optional<T>(null));
     }
 
-    public void remove(String key)
+    @Override
+    public <T> Single get(String key, Type type)
     {
-        mSharedPreferences.edit().remove(key).apply();
+        return getString(key).map(json -> !json.equals("") ?
+                (T) mParserManager.fromJson(json, type) : new Optional<T>(null));
+    }
+
+    @Override
+    public Completable clear()
+    {
+        return Completable.create(e -> mSharedPreferences.edit().clear().apply());
+    }
+
+    @Override
+    public Completable remove(String key)
+    {
+        return Completable.create(e -> mSharedPreferences.edit().remove(key).apply());
     }
 }

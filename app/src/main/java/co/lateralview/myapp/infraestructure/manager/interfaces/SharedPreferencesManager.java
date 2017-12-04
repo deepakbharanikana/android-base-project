@@ -2,33 +2,36 @@ package co.lateralview.myapp.infraestructure.manager.interfaces;
 
 import java.lang.reflect.Type;
 
+import io.reactivex.Completable;
+import io.reactivex.Single;
+
 public interface SharedPreferencesManager
 {
-    void save(String key, boolean value);
+    Completable save(String key, boolean value);
 
-    void save(String key, String value);
+    Completable save(String key, String value);
 
-    void save(String key, int value);
+    Completable save(String key, int value);
 
-    boolean getBoolean(String key);
+    Single<Boolean> getBoolean(String key);
 
-    boolean getBoolean(String key, boolean defaultValue);
+    Single<Boolean> getBoolean(String key, boolean defaultValue);
 
-    String getString(String key);
+    Single<String> getString(String key);
 
-    String getString(String key, String defaultValue);
+    Single<String> getString(String key, String defaultValue);
 
-    int getInt(String key);
+    Single<Integer> getInt(String key);
 
-    int getInt(String key, int defaultValue);
+    Single<Integer> getInt(String key, int defaultValue);
 
-    <T> void save(String key, T model);
+    <T> Completable save(String key, T model);
 
-    <T> T get(String key, Class<T> type);
+    <T> Single get(String key, Class<T> type);
 
-    <T> T get(String key, Type type);
+    <T> Single get(String key, Type type);
 
-    void clear();
+    Completable clear();
 
-    void remove(String key);
+    Completable remove(String key);
 }
